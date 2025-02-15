@@ -17,18 +17,22 @@ export type AvailableCountries = Array<{
     }>;
   };
   
+  export type PopulationCount = {
+    year: number;
+    value: number;
+  };
+  
+  export type CountryPopulationData = {
+    country: string;
+    code: string;
+    iso3: string;
+    populationCounts: PopulationCount[];
+  };
+  
   export type CountryPopulation = {
     error: boolean;
     msg: string;
-    data: Array<{
-      country: string;
-      code: string;
-      iso3: string;
-      populationCounts: Array<{
-        year: number;
-        value: number;
-      }>;
-    }>;
+    data: CountryPopulationData[];
   };
   
   export type CountryFlag = {
@@ -40,5 +44,4 @@ export type AvailableCountries = Array<{
       iso2: string;
       iso3: string;
     }>;
-  };
-  
+  };  

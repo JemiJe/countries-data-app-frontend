@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { Typography, Box, Paper } from '@mui/material';
-import { CountryInfo, CountryPopulation, CountryFlag } from '@/types/types';
+import { CountryInfo, CountryPopulation, CountryPopulationData, CountryFlag } from '@/types/types';
 import BorderCountries from '@/components/BorderCountries';
+import PopulationChart from '@/components/PopulationChart';
 import Image from 'next/image';
 
 const CountryInfoPage = ({ params }: { params: Promise<{ countryCode: string }> }) => {
@@ -17,7 +18,7 @@ const CountryInfoPage = ({ params }: { params: Promise<{ countryCode: string }> 
 
   const [countryInfo, setCountryInfo] = useState<CountryInfo | null>(null);
   const [flag, setFlag] = useState<CountryFlag['data'][number] | null | undefined>(null);
-  const [populationData, setPopulationData] = useState<CountryPopulation | null>(null);
+  const [populationData, setPopulationData] = useState<CountryPopulationData | null | undefined>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,15 +28,20 @@ const CountryInfoPage = ({ params }: { params: Promise<{ countryCode: string }> 
       try {
         const countryRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/countries/info/${countryCode}`);
         const countryData = await countryRes.json();
+        console.log(countryData);
         setCountryInfo(countryData);
 
         const populationRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/countries/population`);
-        const populationData = await populationRes.json();
-        setPopulationData(populationData);
+        const populationData: CountryPopulation = await populationRes.json();
+        // russia is missing on DATE_NAGER
+        const countryPopulation = populationData.data.find( ({ country }) => country === countryData.commonName || country.includes(countryData.commonName))
+        console.log(populationData);
+        setPopulationData(countryPopulation);
 
         const flagsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/countries/flags`);
         const flagsData: CountryFlag = await flagsRes.json();
         const countryFlag = flagsData.data.find(({ name }) => name === countryData.commonName);
+        console.log(flagsData);
         setFlag(countryFlag);
       } catch (err) {
         setError('Failed to fetch country information.');
@@ -50,7 +56,7 @@ const CountryInfoPage = ({ params }: { params: Promise<{ countryCode: string }> 
     return <Typography>{error}</Typography>;
   }
 
-  if (!countryInfo || !populationData) {
+  if (!countryInfo) {
     return <Typography>Loading...</Typography>;
   }
 
@@ -72,6 +78,7 @@ const CountryInfoPage = ({ params }: { params: Promise<{ countryCode: string }> 
 
       <Paper sx={{ padding: 3, marginTop: 4 }}>
         <Typography variant="h5">Population Over Time</Typography>
+        {populationData && populationData !== null ? <PopulationChart populationDataArray={populationData} /> : <Typography>Loading...</Typography>}
       </Paper>
     </Box>
   );
