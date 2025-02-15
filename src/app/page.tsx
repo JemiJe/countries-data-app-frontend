@@ -3,19 +3,30 @@
 import { useEffect, useState } from 'react';
 import { Typography, Card, CardContent, Grid, Box } from '@mui/material';
 import Link from 'next/link';
-import { AvailableCountries } from '@/types/types'
+import { AvailableCountries/*, CountryFlag*/ } from '@/types/types'
 
 const CountryListPage = () => {
   const [countries, setCountries] = useState<AvailableCountries>([]);
+  // const [flags, setFlags] = useState<Record<string, string> | null | undefined>(null);
 
   useEffect(() => {
     const fetchCountries = async () => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/countries/available`);
       const data = await res.json();
-      console.log(data)
       setCountries(data);
     };
     fetchCountries();
+
+    // const fetchFlags = async () => {
+    //   const flagsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/countries/flags`);
+    //   const flagsData: CountryFlag = await flagsRes.json();
+    //   let flagsObject = {};
+    //   for( const { name, flag } of flagsData.data ) {
+    //     flagsObject = { ...flagsObject, ...({ name, flag }) }
+    //   }
+    //   setFlags(flagsObject);
+    // };
+    // fetchFlags();
   }, []);
 
   return (

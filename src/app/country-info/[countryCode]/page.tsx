@@ -28,20 +28,17 @@ const CountryInfoPage = ({ params }: { params: Promise<{ countryCode: string }> 
       try {
         const countryRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/countries/info/${countryCode}`);
         const countryData = await countryRes.json();
-        console.log(countryData);
         setCountryInfo(countryData);
 
         const populationRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/countries/population`);
         const populationData: CountryPopulation = await populationRes.json();
         // russia is missing on DATE_NAGER
         const countryPopulation = populationData.data.find( ({ country }) => country === countryData.commonName || country.includes(countryData.commonName))
-        console.log(populationData);
         setPopulationData(countryPopulation);
 
         const flagsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/countries/flags`);
         const flagsData: CountryFlag = await flagsRes.json();
         const countryFlag = flagsData.data.find(({ name }) => name === countryData.commonName);
-        console.log(flagsData);
         setFlag(countryFlag);
       } catch (err) {
         setError('Failed to fetch country information.');
